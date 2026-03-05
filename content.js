@@ -81,6 +81,7 @@
   // elements in the row for one that mentions "review" or "approv".
 
   function parseListReview(row) {
+    // Attempt 1: legacy aria-label on an <a> element.
     const badge =
       row.querySelector('span.d-none.d-md-inline-flex a[aria-label]') ||
       row.querySelector('span.d-inline-block.ml-1 a[aria-label]') ||
@@ -88,17 +89,25 @@
         /review|approv/i.test(el.getAttribute('aria-label') || '')
       );
 
-    if (!badge) return { type: 'none' };
+    const labelText = badge ? (badge.getAttribute('aria-label') || '').toLowerCase() : null;
 
-    const label = (badge.getAttribute('aria-label') || '').toLowerCase();
+    // Attempt 2: modern GitHub renders review status as span.lh-condensed text.
+    const spanText = labelText === null
+      ? ([...row.querySelectorAll('span.lh-condensed')]
+          .map(el => el.textContent.trim().toLowerCase())
+          .find(t => /review|approv/i.test(t)) ?? null)
+      : null;
 
-    const approvalMatch = label.match(/(\d+)\s+(review\s+approvals?|approving\s+reviews?)/);
+    const text = labelText ?? spanText;
+    if (!text) return { type: 'none' };
+
+    const approvalMatch = text.match(/(\d+)\s+(review\s+approvals?|approving\s+reviews?)/);
     if (approvalMatch) return { type: 'approved', count: parseInt(approvalMatch[1], 10) };
 
-    const changesMatch = label.match(/(\d+)\s+reviews?\s+requesting\s+changes?/);
+    const changesMatch = text.match(/(\d+)\s+reviews?\s+requesting\s+changes?/);
     if (changesMatch) return { type: 'changes', count: parseInt(changesMatch[1], 10) };
 
-    if (label.includes('review required')) return { type: 'required' };
+    if (text.includes('review required')) return { type: 'required' };
 
     return { type: 'none' };
   }
