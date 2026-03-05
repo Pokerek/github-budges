@@ -71,18 +71,23 @@
 
   // ── Parse list-view aggregate review badge ────────────────────────────────────
   //
-  // Selector confirmed from DOM inspection:
-  //   span.d-none.d-md-inline-flex > span.d-inline-block.ml-1 > a[aria-label]
-  //
-  // aria-label patterns:
+  // aria-label patterns observed on GitHub:
   //   "Review required before merging"
   //   "N review approvals" / "N approving reviews"
   //   "N review requesting changes" / "N reviews requesting changes"
+  //
+  // The parent selectors for the badge element change with GitHub redesigns, so we
+  // try specific known selectors first and fall back to scanning all [aria-label]
+  // elements in the row for one that mentions "review" or "approv".
 
   function parseListReview(row) {
-    const badge = row.querySelector(
-      'span.d-none.d-md-inline-flex a[aria-label], span.d-inline-block.ml-1 a[aria-label]'
-    );
+    const badge =
+      row.querySelector('span.d-none.d-md-inline-flex a[aria-label]') ||
+      row.querySelector('span.d-inline-block.ml-1 a[aria-label]') ||
+      [...row.querySelectorAll('[aria-label]')].find(el =>
+        /review|approv/i.test(el.getAttribute('aria-label') || '')
+      );
+
     if (!badge) return { type: 'none' };
 
     const label = (badge.getAttribute('aria-label') || '').toLowerCase();
@@ -99,9 +104,18 @@
   }
 
   // ── Parse PR author ───────────────────────────────────────────────────────────
+  //
+  // The author link sits in the PR byline ("opened X ago by <user>"). We try
+  // progressively broader selectors so the extension survives GitHub DOM changes.
 
   function parseAuthor(row) {
-    return row.querySelector('.opened-by a.Link--muted')?.textContent?.trim() || null;
+    return (
+      row.querySelector('.opened-by a.Link--muted') ||
+      row.querySelector('.opened-by a') ||
+      // Modern GitHub: author hovercard in the small-text byline area
+      row.querySelector('.text-small a[data-hovercard-type="user"]') ||
+      row.querySelector('[class*="opened"] a[data-hovercard-type="user"]')
+    )?.textContent?.trim() || null;
   }
 
   // ── Build badges ──────────────────────────────────────────────────────────────
