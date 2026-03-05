@@ -15,7 +15,6 @@ On any GitHub `/pulls` page the extension injects small badges next to each PR t
 | `Review requested` | You were asked to review this PR |
 | `Approved by you` | You already approved this PR |
 | `Changes requested by you` | You requested changes on this PR |
-| `Needs review` | PR needs a review, no personal relation |
 
 ## How it works
 

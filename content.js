@@ -137,7 +137,9 @@
         container.appendChild(makeBadge('changes', 'x', 'Changes requested by you'));
       }
 
-      // Aggregate counts from list view
+      // Aggregate counts from list view — shown as context only, not as an action prompt.
+      // "review required" without a personal hovercard signal is intentionally not shown:
+      // it means someone needs to review, but not necessarily you.
       if (listReview.type === 'approved') {
         container.appendChild(makeBadge(
           'approved', 'check',
@@ -148,9 +150,6 @@
           'changes', 'x',
           `${listReview.count} change${listReview.count !== 1 ? 's' : ''} requested`
         ));
-      } else if (listReview.type === 'required' && !myStatus) {
-        // Only show generic "Needs review" if we have no personal status
-        container.appendChild(makeBadge('needs-review', 'eye', 'Needs review'));
       }
     }
 
