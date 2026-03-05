@@ -14,7 +14,7 @@ On any GitHub `/pulls` page the extension injects small badges next to each PR t
 | `N changes requested` | Someone blocked your PR |
 | `Review requested` | You were asked to review this PR |
 | `Approved by you` | You already approved this PR |
-| `Changes requested by you` | You requested changes on this PR |
+| `Reviewed` | You commented or requested changes — awaiting author response |
 
 ## How it works
 

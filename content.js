@@ -128,13 +128,19 @@
       }
 
     } else {
-      // Personal status from hovercard (most specific — shown first)
+      // Personal status from hovercard only — aggregate list-view state is never used
+      // to infer actionability for the current user.
       if (myStatus === 'review_requested') {
+        // Hovercard says "You have a pending review request" — explicitly actionable.
         container.appendChild(makeBadge('needs-review', 'eye', 'Review requested', 'You have a pending review request'));
       } else if (myStatus === 'approved') {
         container.appendChild(makeBadge('approved', 'check', 'Approved by you'));
       } else if (myStatus === 'changes_requested') {
-        container.appendChild(makeBadge('changes', 'x', 'Changes requested by you'));
+        // You reviewed and blocked — not yet resolved, no further action needed from you.
+        container.appendChild(makeBadge('reviewed', 'eye', 'Reviewed', 'You requested changes'));
+      } else if (myStatus === 'commented') {
+        // You left a comment during review — not yet resolved, no further action needed from you.
+        container.appendChild(makeBadge('reviewed', 'eye', 'Reviewed', 'You commented'));
       }
 
       // Aggregate counts from list view — shown as context only, not as an action prompt.

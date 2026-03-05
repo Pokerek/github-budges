@@ -33,11 +33,18 @@
   border: 1px solid #1a7f37;
 }
 
-/* Changes requested badge */
+/* Changes requested badge (on your own PRs) */
 .pr-badge--changes {
   background-color: #fff0e5;
   color: #bc4c00;
   border: 1px solid #f8b88e;
+}
+
+/* Reviewed by you — changes requested or commented, awaiting author response */
+.pr-badge--reviewed {
+  background-color: #fbefff;
+  color: #8250df;
+  border: 1px solid #d8b4fe;
 }
 
 /* Needs my review badge */
