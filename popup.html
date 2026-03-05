@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub PR Review Badges</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 280px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      color: #1f2328;
+      background: #ffffff;
+    }
+
+    header {
+      padding: 12px 14px;
+      background: #f6f8fa;
+      border-bottom: 1px solid #d0d7de;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    header h1 { font-size: 13px; font-weight: 600; }
+
+    .content { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+    .note {
+      font-size: 11px;
+      color: #57606a;
+      line-height: 1.5;
+      padding: 8px 10px;
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+    }
+
+    label { font-weight: 600; font-size: 12px; display: block; margin-bottom: 6px; }
+
+    .legend { display: flex; flex-direction: column; gap: 5px; }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      color: #57606a;
+    }
+
+    .b {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    .b-my-pr       { background:#ddf4ff; color:#0969da; border:1px solid #80ccff; }
+    .b-approved    { background:#dafbe1; color:#1a7f37; border:1px solid #82e59a; }
+    .b-approved-f  { background:#1a7f37; color:#fff; border:1px solid #1a7f37; }
+    .b-needs       { background:#fff8c5; color:#9a6700; border:1px solid #f5ce47; }
+    .b-changes     { background:#fff0e5; color:#bc4c00; border:1px solid #f8b88e; }
+    .b-awaiting    { background:#f6f8fa; color:#57606a; border:1px solid #d0d7de; }
+
+    hr { border: none; border-top: 1px solid #d0d7de; }
+  </style>
+</head>
+<body>
+  <header>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="#57606a">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </svg>
+    <h1>PR Review Badges</h1>
+  </header>
+
+  <div class="content">
+    <div class="note">
+      Works automatically on any GitHub <code>/pulls</code> page.<br>
+      No token needed — reads directly from the page.
+    </div>
+
+    <hr>
+
+    <div>
+      <label>Badge guide</label>
+      <div class="legend">
+        <div class="legend-row">
+          <span class="b b-my-pr">My PR</span>
+          <span>your own pull request</span>
+        </div>
+        <div class="legend-row">
+          <span class="b b-needs">Review requested</span>
+          <span>you're asked to review</span>
+        </div>
+        <div class="legend-row">
+          <span class="b b-approved">Approved by you</span>
+          <span>you approved it</span>
+        </div>
+        <div class="legend-row">
+          <span class="b b-changes">Changes by you</span>
+          <span>you blocked it</span>
+        </div>
+        <div class="legend-row">
+          <span class="b b-approved-f">2 approvals</span>
+          <span>your PR — approvals received</span>
+        </div>
+        <div class="legend-row">
+          <span class="b b-awaiting">3 awaiting</span>
+          <span>your PR — pending reviews</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+.pr-badge-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+  flex-wrap: wrap;
+}
+
+.pr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Approvals badge */
+.pr-badge--approved {
+  background-color: #dafbe1;
+  color: #1a7f37;
+  border: 1px solid #82e59a;
+}
+
+.pr-badge--approved-full {
+  background-color: #1a7f37;
+  color: #ffffff;
+  border: 1px solid #1a7f37;
+}
+
+/* Changes requested badge */
+.pr-badge--changes {
+  background-color: #fff0e5;
+  color: #bc4c00;
+  border: 1px solid #f8b88e;
+}
+
+/* Needs my review badge */
+.pr-badge--needs-review {
+  background-color: #fff8c5;
+  color: #9a6700;
+  border: 1px solid #f5ce47;
+}
+
+/* My PR badge */
+.pr-badge--my-pr {
+  background-color: #ddf4ff;
+  color: #0969da;
+  border: 1px solid #80ccff;
+}
+
+/* Awaiting reviews badge (for my PRs) */
+.pr-badge--awaiting {
+  background-color: #f6f8fa;
+  color: #57606a;
+  border: 1px solid #d0d7de;
+}
+
+/* Loading skeleton */
+.pr-badge--loading {
+  background-color: #f6f8fa;
+  color: #57606a;
+  border: 1px solid #d0d7de;
+  animation: pr-badge-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pr-badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pr-badge svg {
+  flex-shrink: 0;
+}
