@@ -6,6 +6,7 @@
 
   // ── Cache: hovercard-url → parsed data ───────────────────────────────────────
   const cache = new Map();
+  let abortController = new AbortController();
 
   // ── SVG icons ─────────────────────────────────────────────────────────────────
   const ICONS = {
@@ -41,12 +42,13 @@
         const res = await fetch(url, {
           headers: { 'X-Requested-With': 'XMLHttpRequest' },
           credentials: 'same-origin',
+          signal: abortController.signal,
         });
         if (!res.ok) return null;
         const html = await res.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        return parseHovercard(doc);
-      } catch {
+        return parseHovercard(html);
+      } catch (e) {
+        if (e.name === 'AbortError') cache.delete(url);
         return null;
       }
     })();
@@ -55,20 +57,15 @@
     return promise;
   }
 
-  function parseHovercard(doc) {
-    // Personal review status — sits inside the last .border-top section
-    const statusText = [...doc.querySelectorAll('span.lh-condensed')]
-      .map(el => el.textContent.trim().toLowerCase())
-      .find(t => t.includes('you ') || t.includes('pending'));
-
+  function parseHovercard(html) {
+    // Search the raw HTML string — avoids creating a full DOM document per hovercard.
+    // GitHub's status phrases are specific enough that plain string search is safe here.
+    const lower = html.toLowerCase();
     let myStatus = null; // 'review_requested' | 'approved' | 'changes_requested' | 'commented'
-    if (statusText) {
-      if (statusText.includes('pending review request'))        myStatus = 'review_requested';
-      else if (statusText.includes('approved'))                 myStatus = 'approved';
-      else if (statusText.includes('requested changes'))        myStatus = 'changes_requested';
-      else if (statusText.includes('commented'))                myStatus = 'commented';
-    }
-
+    if      (lower.includes('pending review request'))  myStatus = 'review_requested';
+    else if (lower.includes('you approved'))            myStatus = 'approved';
+    else if (lower.includes('you requested changes'))   myStatus = 'changes_requested';
+    else if (lower.includes('you commented'))           myStatus = 'commented';
     return { myStatus };
   }
 
@@ -221,16 +218,36 @@
     return /\/pulls(\?|$|#)|^\/pulls$/.test(location.href);
   }
 
+  function onNavigate() {
+    // Abort in-flight hovercard fetches and clear stale cache entries on navigation.
+    abortController.abort();
+    abortController = new AbortController();
+    cache.clear();
+    if (isPrListPage()) run();
+  }
+
   if (isPrListPage()) {
     run();
 
     let timer;
-    new MutationObserver(() => {
-      clearTimeout(timer);
-      timer = setTimeout(run, 400);
+    new MutationObserver(mutations => {
+      if (!isPrListPage()) return;
+      // Only debounce if nodes containing PR links were actually added —
+      // skips the constant churn from GitHub's unrelated DOM mutations.
+      for (const { addedNodes } of mutations) {
+        for (const node of addedNodes) {
+          if (node.nodeType !== 1) continue;
+          if (node.querySelector('a[href*="/pull/"]') !== null ||
+              node.matches('a[href*="/pull/"]')) {
+            clearTimeout(timer);
+            timer = setTimeout(run, 400);
+            return;
+          }
+        }
+      }
     }).observe(document.body, { childList: true, subtree: true });
 
-    document.addEventListener('turbo:render', run);
-    document.addEventListener('pjax:end', run);
+    document.addEventListener('turbo:render', onNavigate);
+    document.addEventListener('pjax:end', onNavigate);
   }
 })();
