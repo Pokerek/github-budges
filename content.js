@@ -34,6 +34,8 @@
   //   "You requested changes to this pull request"
 
   async function fetchHovercard(url) {
+    console.log({url})
+
     if (cache.has(url)) return cache.get(url);
 
     // Store a promise immediately to avoid duplicate in-flight requests
@@ -95,7 +97,7 @@
     const spanText = labelText === null
       ? ([...row.querySelectorAll('span.lh-condensed')]
           .map(el => el.textContent.trim().toLowerCase())
-          .find(t => /review|approv/i.test(t)) ?? null)
+          .find(t => /review|approv|change/i.test(t)) ?? null)
       : null;
 
     const text = labelText ?? spanText;
@@ -104,8 +106,11 @@
     const approvalMatch = text.match(/(\d+)\s+(review\s+approvals?|approving\s+reviews?)/);
     if (approvalMatch) return { type: 'approved', count: parseInt(approvalMatch[1], 10) };
 
-    const changesMatch = text.match(/(\d+)\s+reviews?\s+requesting\s+changes?/);
+    // GitHub may render: "N reviews requesting changes", "N changes requested", or "changes requested"
+    const changesMatch = text.match(/(\d+)\s+reviews?\s+requesting\s+changes?/) ||
+                         text.match(/(\d+)\s+changes?\s+requested/);
     if (changesMatch) return { type: 'changes', count: parseInt(changesMatch[1], 10) };
+    if (/\bchanges?\s+requested\b/.test(text) && !/^\d/.test(text)) return { type: 'changes', count: 1 };
 
     if (text.includes('review required')) return { type: 'required' };
 
@@ -204,14 +209,11 @@
     placeholder.appendChild(makeBadge('loading', '', '···'));
     titleLink.insertAdjacentElement('afterend', placeholder);
 
-    // Fetch hovercard for personal review status (skip for own PRs — hovercard won't say "you requested")
-    let myStatus = null;
-    if (!isMyPr) {
-      const hovercardUrl = titleLink.getAttribute('data-hovercard-url') ||
-        titleLink.href.replace('https://github.com', '') + '/hovercard';
-      const hc = await fetchHovercard(hovercardUrl);
-      myStatus = hc?.myStatus || null;
-    }
+    // Fetch hovercard for personal review status for every PR
+    const hovercardUrl = titleLink.getAttribute('data-hovercard-url') ||
+      titleLink.href.replace('https://github.com', '') + '/hovercard';
+    const hc = await fetchHovercard(hovercardUrl);
+    const myStatus = hc?.myStatus || null;
 
     const badges = buildBadges({ isMyPr, listReview, myStatus });
     if (badges) {
