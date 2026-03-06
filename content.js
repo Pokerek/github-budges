@@ -256,26 +256,36 @@
 
   if (isPrListPage()) {
     run();
+  }
 
-    let timer;
-    new MutationObserver(mutations => {
-      if (!isPrListPage()) return;
-      // Only debounce if nodes containing PR links were actually added —
-      // skips the constant churn from GitHub's unrelated DOM mutations.
-      for (const { addedNodes } of mutations) {
-        for (const node of addedNodes) {
-          if (node.nodeType !== 1) continue;
-          if (node.querySelector('a[href*="/pull/"]') !== null ||
-              node.matches('a[href*="/pull/"]')) {
-            clearTimeout(timer);
-            timer = setTimeout(run, 400);
-            return;
-          }
+  let timer;
+  new MutationObserver(mutations => {
+    if (!isPrListPage()) return;
+    // Only debounce if nodes containing PR links were actually added —
+    // skips the constant churn from GitHub's unrelated DOM mutations.
+    for (const { addedNodes } of mutations) {
+      for (const node of addedNodes) {
+        if (node.nodeType !== 1) continue;
+        if (node.querySelector('a[href*="/pull/"]') !== null ||
+            node.matches('a[href*="/pull/"]')) {
+          clearTimeout(timer);
+          timer = setTimeout(run, 400);
+          return;
         }
       }
-    }).observe(document.body, { childList: true, subtree: true });
+    }
+  }).observe(document.body, { childList: true, subtree: true });
 
-    document.addEventListener('turbo:render', onNavigate);
-    document.addEventListener('pjax:end', onNavigate);
-  }
+  document.addEventListener('turbo:render', onNavigate);
+  document.addEventListener('pjax:end', onNavigate);
+
+  // Back/forward navigation via bfcache — turbo/pjax events don't fire in this case.
+  window.addEventListener('pageshow', e => {
+    if (e.persisted && isPrListPage()) onNavigate();
+  });
+
+  // Tab switching — re-process any rows that lost their badges while the tab was hidden.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && isPrListPage()) run();
+  });
 })();
