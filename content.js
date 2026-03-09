@@ -69,6 +69,7 @@
 
     if (lower.match(/\S+\s+and\s+\S+\s+approved/)) approvals = 2;
     else if (lower.match(/\S+\s+approved/)) approvals = 1;
+    else if (lower.match(/approved/)) approvals = 2;
 
     if (lower.match(/\S+\s+and\s+\S+\s+requested\s+changes/)) changesRequested = 2;
     else if (lower.match(/\S+\s+requested\s+changes/)) changesRequested = 1;
